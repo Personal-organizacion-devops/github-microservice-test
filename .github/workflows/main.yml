@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Obtener código de fuente
         uses: actions/checkout@v4
+      - name: Get short SHA
+        id: short
+        run: echo "short_sha=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
       - name: Instalar dependencias
         run: echo "Iniciando build"
       - name: Configure AWS credentials
@@ -27,7 +30,7 @@ jobs:
         env:
           ECR_REGISTRY: 306157427831.dkr.ecr.us-east-1.amazonaws.com
           ECR_REPOSITORY: devops-registry
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ github.event.repository.name }}@${{ steps.short.outputs.short_sha }} 
         run: |
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
