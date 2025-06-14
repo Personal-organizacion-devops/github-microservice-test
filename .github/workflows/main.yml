@@ -39,7 +39,7 @@ jobs:
 
   deploy-qa:
     name: CD [qa]
-    needs: [approve-qa]
+    needs: [approval-qa]
     environment: dev
     runs-on: ubuntu-latest
 
