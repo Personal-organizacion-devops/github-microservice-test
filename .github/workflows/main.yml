@@ -60,7 +60,7 @@ jobs:
 
   deploy-prd:
     name: CD [prd]
-    needs: [deploy-qa]
+    needs: [approval-prd]
     environment: dev
     runs-on: ubuntu-latest
 
