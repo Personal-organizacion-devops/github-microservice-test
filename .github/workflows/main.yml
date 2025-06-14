@@ -29,8 +29,8 @@ jobs:
       - name: Build, tag, and push image to ECR
         env:
           ECR_REGISTRY: 306157427831.dkr.ecr.us-east-1.amazonaws.com
-          ECR_REPOSITORY: devops-registry
-          IMAGE_TAG: ${{ github.event.repository.name }}@${{ steps.short.outputs.short_sha }} 
+          ECR_REPOSITORY: ${{ github.event.repository.name }}
+          IMAGE_TAG: ${{ steps.short.outputs.short_sha }} 
         run: |
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
