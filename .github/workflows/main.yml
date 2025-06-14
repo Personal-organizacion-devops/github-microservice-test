@@ -42,7 +42,7 @@ jobs:
 
   deploy-prd:
     name: Continuous Deployment
-    needs: [deploy-prd]
+    needs: [deploy-qa]
     environment: dev
     runs-on: ubuntu-latest
 
