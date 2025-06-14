@@ -57,6 +57,9 @@ jobs:
     steps:
       - name: Obtener código de fuente
         uses: actions/checkout@v4
+      - name: Get short SHA
+        id: short
+        run: echo "short_sha=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -72,7 +75,7 @@ jobs:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: 306157427831.dkr.ecr.us-east-1.amazonaws.com
           ECR_REPOSITORY: ${{ github.event.repository.name }}
-          IMAGE_TAG: ${{ needs.build.outputs.short_sha }}
+          IMAGE_TAG: ${{ steps.short.outputs.short_sha }} 
 
   approval-qa:
     environment:
