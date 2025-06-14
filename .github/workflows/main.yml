@@ -54,12 +54,19 @@ jobs:
     needs: [build]
     environment: dev
     runs-on: ubuntu-latest
-
     steps:
       - name: Obtener código de fuente
         uses: actions/checkout@v4
-      - name: Instalar dependencias
-        run: echo "Iniciando despliegue en dev"
+      - name: Update Lambda function
+        run: |
+          aws lambda update-function-code \
+            --function-name lambda-ms-demo-qa \
+            --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          ECR_REGISTRY: 306157427831.dkr.ecr.us-east-1.amazonaws.com
+          ECR_REPOSITORY: ${{ github.event.repository.name }}
+          IMAGE_TAG: ${{ needs.build.outputs.short_sha }}
 
   approval-qa:
     environment:
