@@ -1,11 +1,8 @@
-FROM node:18-alpine
+FROM public.ecr.aws/lambda/nodejs:18
 
-WORKDIR /app
 COPY package*.json ./
 RUN npm install --production
 
 COPY . .
 
-EXPOSE 80
-
-CMD ["node", "index.js"]
+CMD ["index.handler"]
