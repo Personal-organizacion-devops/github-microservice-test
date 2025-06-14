@@ -1,0 +1,53 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Continuous Integration
+    environment: dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener código de fuente
+        uses: actions/checkout@v4
+      - name: Instalar dependencias
+        run: echo "Iniciando build"
+
+  deploy-dev:
+    name: Continuous Deployment
+    needs: [build]
+    environment: dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener código de fuente
+        uses: actions/checkout@v4
+      - name: Instalar dependencias
+        run: echo "Iniciando despliegue en dev"
+
+  deploy-qa:
+    name: Continuous Deployment
+    needs: [deploy-dev]
+    environment: dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener código de fuente
+        uses: actions/checkout@v4
+      - name: Instalar dependencias
+        run: echo "Iniciando despliegue en qa"
+
+  deploy-prd:
+    name: Continuous Deployment
+    needs: [deploy-prd]
+    environment: dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener código de fuente
+        uses: actions/checkout@v4
+      - name: Instalar dependencias
+        run: echo "Iniciando despliegue en prd"
