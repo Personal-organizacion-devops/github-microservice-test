@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Continuous Integration
+    name: CI-DEV
     environment: dev
     runs-on: ubuntu-latest
 
@@ -17,7 +17,7 @@ jobs:
         run: echo "Iniciando build"
 
   deploy-dev:
-    name: Continuous Deployment
+    name: CD-DEV
     needs: [build]
     environment: dev
     runs-on: ubuntu-latest
@@ -29,7 +29,7 @@ jobs:
         run: echo "Iniciando despliegue en dev"
 
   deploy-qa:
-    name: Continuous Deployment
+    name: CD-QA
     needs: [deploy-dev]
     environment: dev
     runs-on: ubuntu-latest
@@ -41,7 +41,7 @@ jobs:
         run: echo "Iniciando despliegue en qa"
 
   deploy-prd:
-    name: Continuous Deployment
+    name: CD-PRD
     needs: [deploy-qa]
     environment: dev
     runs-on: ubuntu-latest
