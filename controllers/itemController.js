@@ -1,8 +1,13 @@
 const { faker } = require('@faker-js/faker');
+const { injectSecrets } = require('../libs/secrets');
+
+async function startSecrets() {
+  await injectSecrets();
+  API_PROVIDER_URL = process.env.API_PROVIDER_URL || 'localhost';
+}
+startSecrets();
 
 let items = [];
-
-API_PROVIDER_URL = process.env.API_PROVIDER_URL || 'localhost';
 
 // Generar datos fake si está vacío
 function generateFakeItems(count = 10) {
