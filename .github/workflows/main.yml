@@ -75,11 +75,12 @@ jobs:
           REGION: ${{ vars.AWS_REGION }}
         run: |
           FUNCTION_NAME=lambda-ms-demo-dev
+          SECRET_NAME=secret-ms-demo-dev
 
           # Actualizar variables de entorno
           aws lambda update-function-configuration \
             --function-name $FUNCTION_NAME \
-            --environment "Variables={REGION=$REGION}"
+            --environment "Variables={AWS_REGION=$REGION, SECRET_NAME:$SECRET_NAME}"
 
           echo "Esperando que termine la actualización de variables..."
 
