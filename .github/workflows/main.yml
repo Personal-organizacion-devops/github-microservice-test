@@ -80,7 +80,7 @@ jobs:
           # Actualizar variables de entorno
           aws lambda update-function-configuration \
             --function-name $FUNCTION_NAME \
-            --environment "Variables={AWS_REGION=$REGION, SECRET_NAME:$SECRET_NAME}"
+            --environment "Variables={AWS_REGION=$REGION,SECRET_NAME=$SECRET_NAME}"
 
           echo "Esperando que termine la actualización de variables..."
 
