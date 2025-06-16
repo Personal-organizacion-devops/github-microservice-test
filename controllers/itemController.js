@@ -2,6 +2,8 @@ const { faker } = require('@faker-js/faker');
 
 let items = [];
 
+API_PROVIDER_URL = process.env.API_PROVIDER_URL || 'localhost';
+
 // Generar datos fake si está vacío
 function generateFakeItems(count = 10) {
   return Array.from({ length: count }, () => ({
@@ -19,7 +21,12 @@ exports.getAllItems = (req, res) => {
   }
   res.status(200);
   res.setHeader('Content-Type', 'application/json');
-  res.json(items);
+  res.json({
+    metadata: {
+      provider: API_PROVIDER_URL
+    },
+    items
+  });
 };
 
 // Endpoint: GET /api/items/:id
@@ -27,7 +34,12 @@ exports.getItem = (req, res) => {
   const item = items.find(i => i.id === req.params.id);
   
   res.setHeader('Content-Type', 'application/json');
-  item ? res.json(item) : res.status(404).send('Item not found');
+  item ? res.json({
+    metadata: {
+      provider: API_PROVIDER_URL
+    },
+    item
+  }) : res.status(404).send('Item not found');
 };
 
 // Endpoint: POST /api/items
@@ -40,7 +52,12 @@ exports.createItem = (req, res) => {
     items.push(newItem);
     
     res.setHeader('Content-Type', 'application/json');
-    res.status(201).json(newItem);
+    res.status(201).json({
+    metadata: {
+      provider: API_PROVIDER_URL
+    },
+    newItem
+  });
 };
 
 // Endpoint: PUT /api/items/:id
