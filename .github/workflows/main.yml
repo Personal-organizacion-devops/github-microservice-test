@@ -49,7 +49,7 @@ jobs:
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  deploy-reutil:
+  deploy-dev:
     name: "CD [dev]"
     needs: [build]
     environment: 'dev'
@@ -57,68 +57,69 @@ jobs:
     with:
       aws_region: ${{ vars.AWS_REGION }}
       environment: 'dev'
+      app_name: 'ms-demo'
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  deploy-dev:
-    name: "CD [dev]"
-    needs: [deploy-reutil]
-    environment: dev
-    runs-on: ubuntu-latest
-    steps:
-      - name: Obtener código de fuente
-        uses: actions/checkout@v4
-      - name: Get short SHA
-        id: short
-        run: echo "short_sha=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
-      - name: Update Lambda function
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          ECR_REGISTRY: 306157427831.dkr.ecr.us-east-1.amazonaws.com
-          ECR_REPOSITORY: ${{ github.event.repository.name }}
-          IMAGE_TAG: ${{ steps.short.outputs.short_sha }}
-          REGION: ${{ vars.AWS_REGION }}
-        run: |
-          FUNCTION_NAME=lambda-ms-demo-dev
-          SECRET_NAME=secret-ms-demo-dev
+  # deploy-dev:
+  #   name: "CD [dev]"
+  #   needs: [deploy-reutil]
+  #   environment: dev
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Obtener código de fuente
+  #       uses: actions/checkout@v4
+  #     - name: Get short SHA
+  #       id: short
+  #       run: echo "short_sha=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v3
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ vars.AWS_REGION }}
+  #     - name: Update Lambda function
+  #       env:
+  #         AWS_REGION: ${{ vars.AWS_REGION }}
+  #         ECR_REGISTRY: 306157427831.dkr.ecr.us-east-1.amazonaws.com
+  #         ECR_REPOSITORY: ${{ github.event.repository.name }}
+  #         IMAGE_TAG: ${{ steps.short.outputs.short_sha }}
+  #         REGION: ${{ vars.AWS_REGION }}
+  #       run: |
+  #         FUNCTION_NAME=lambda-ms-demo-dev
+  #         SECRET_NAME=secret-ms-demo-dev
 
-          # Actualizar variables de entorno
-          aws lambda update-function-configuration \
-            --function-name $FUNCTION_NAME \
-            --environment "Variables={REGION=$REGION,SECRET_NAME=$SECRET_NAME}"
+  #         # Actualizar variables de entorno
+  #         aws lambda update-function-configuration \
+  #           --function-name $FUNCTION_NAME \
+  #           --environment "Variables={REGION=$REGION,SECRET_NAME=$SECRET_NAME}"
 
-          echo "Esperando que termine la actualización de variables..."
+  #         echo "Esperando que termine la actualización de variables..."
 
-          # Esperar hasta que la actualización sea exitosa
-          while true; do
-            STATUS=$(aws lambda get-function-configuration \
-              --function-name $FUNCTION_NAME \
-              --query LastUpdateStatus --output text)
-            echo "Estado actual: $STATUS"
+  #         # Esperar hasta que la actualización sea exitosa
+  #         while true; do
+  #           STATUS=$(aws lambda get-function-configuration \
+  #             --function-name $FUNCTION_NAME \
+  #             --query LastUpdateStatus --output text)
+  #           echo "Estado actual: $STATUS"
 
-            if [ "$STATUS" == "Successful" ]; then
-              echo "Actualización de variables completada."
-              break
-            elif [ "$STATUS" == "Failed" ]; then
-              echo "Error: la actualización de variables falló."
-              exit 1
-            else
-              echo "Esperando 5 segundos..."
-              sleep 5
-            fi
-          done
+  #           if [ "$STATUS" == "Successful" ]; then
+  #             echo "Actualización de variables completada."
+  #             break
+  #           elif [ "$STATUS" == "Failed" ]; then
+  #             echo "Error: la actualización de variables falló."
+  #             exit 1
+  #           else
+  #             echo "Esperando 5 segundos..."
+  #             sleep 5
+  #           fi
+  #         done
 
-          # Actualizar código (imagen container)
-          aws lambda update-function-code \
-            --function-name $FUNCTION_NAME \
-            --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+  #         # Actualizar código (imagen container)
+  #         aws lambda update-function-code \
+  #           --function-name $FUNCTION_NAME \
+  #           --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
 
   approval-qa:

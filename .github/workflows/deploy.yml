@@ -7,6 +7,10 @@ on:
         description: 'Environment to deploy to (e.g., dev, prod)'
         required: true
         type: string
+      app_name:
+        description: 'Application name for deployment'
+        required: true
+        type: string
       aws_region:
         description: 'AWS region for deployment'
         required: true
@@ -41,8 +45,8 @@ jobs:
           IMAGE_TAG: ${{ steps.short.outputs.short_sha }}
           REGION: ${{ input.aws_region }}
         run: |
-          FUNCTION_NAME=lambda-ms-demo-dev
-          SECRET_NAME=secret-ms-demo-dev
+          FUNCTION_NAME="lambda-${{ inputs.app_name }}-${{ inputs.environment }}"
+          SECRET_NAME="secret-${{ inputs.app_name }}-${{ inputs.environment }}"
 
           # Actualizar variables de entorno
           aws lambda update-function-configuration \
