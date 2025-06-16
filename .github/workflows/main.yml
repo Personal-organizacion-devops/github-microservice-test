@@ -49,9 +49,17 @@ jobs:
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  deploy-dev:
+  deploy-reutil:
     name: "CD [dev]"
     needs: [build]
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: dev
+      region: ${{ vars.AWS_REGION }}
+
+  deploy-dev:
+    name: "CD [dev]"
+    needs: [deploy-reutil]
     environment: dev
     runs-on: ubuntu-latest
     steps:
