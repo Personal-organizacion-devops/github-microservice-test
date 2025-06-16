@@ -1,12 +1,13 @@
+// itemController.js
+
 const { faker } = require('@faker-js/faker');
 
-const secrets = require('../libs/secrets');
-
-secrets.injectSecrets();
+const { getSecrets } = require('../libs/secrets');
 
 let items = [];
 
-API_PROVIDER_URL = process.env.API_PROVIDER_URL || 'localhost';
+const secrets = await getSecrets();
+const API_PROVIDER_URL = secrets.API_PROVIDER_URL || 'localhost';
 
 // Generar datos fake si está vacío
 function generateFakeItems(count = 10) {
