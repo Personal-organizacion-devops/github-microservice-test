@@ -74,7 +74,7 @@ jobs:
   deploy-qa:
     name: "CD [qa]"
     needs: [approval-qa]
-    environment: 'qa'
+    # environment: 'qa'
     uses: ./.github/workflows/deploy.yml
     with:
       aws_region: ${{ vars.AWS_REGION }}
@@ -96,7 +96,7 @@ jobs:
   deploy-prd:
     name: "CD [prd]"
     needs: [approval-prd]
-    environment: 'prd'
+    # environment: 'prd'
     uses: ./.github/workflows/deploy.yml
     with:
       aws_region: ${{ vars.AWS_REGION }}
