@@ -52,7 +52,7 @@ jobs:
   deploy-dev:
     name: "CD [dev]"
     needs: [build]
-    environment: 'dev'
+    # environment: 'dev'
     uses: ./.github/workflows/deploy.yml
     with:
       aws_region: ${{ vars.AWS_REGION }}
