@@ -3,15 +3,14 @@ const app = require('./app');
 const { injectSecrets } = require('./libs/secrets');
 
 let server;
-
-const init = async () => {
-  await injectSecrets();
-  server = serverlessExpress({ app });
-};
-
-const initPromise = init();
+let secretsInjected = false;
 
 exports.handler = async (event, context) => {
-  await initPromise;
+  if (!secretsInjected) {
+    await injectSecrets();
+    secretsInjected = true;
+    server = serverlessExpress({ app });
+  }
+
   return server(event, context);
 };
