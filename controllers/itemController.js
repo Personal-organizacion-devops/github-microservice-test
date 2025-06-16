@@ -2,10 +2,15 @@
 const { faker } = require('@faker-js/faker');
 const { injectSecrets } = require('../libs/secrets');
 
-async function startSecrets() {
-  await injectSecrets();
-}
-startSecrets();
+let secretsLoaded = false;
+
+// Promesa para inicializar secretos solo una vez (en cold start)
+const initPromise = (async () => {
+  if (!secretsLoaded) {
+    await injectSecrets();
+    secretsLoaded = true;
+  }
+})();
 
 let items = [];
 
@@ -19,11 +24,19 @@ function generateFakeItems(count = 10) {
   }));
 }
 
+// Middleware/función para asegurarnos que los secretos están listos
+async function ensureSecretsLoaded() {
+  await initPromise;
+}
+
 // Endpoint: GET /api/items
-exports.getAllItems = (req, res) => {
+exports.getAllItems = async (req, res) => {
+  await ensureSecretsLoaded();
+
   if (items.length === 0) {
     items = generateFakeItems(10);
   }
+
   res.status(200);
   res.setHeader('Content-Type', 'application/json');
   res.json({
@@ -35,29 +48,37 @@ exports.getAllItems = (req, res) => {
 };
 
 // Endpoint: GET /api/items/:id
-exports.getItem = (req, res) => {
+exports.getItem = async (req, res) => {
+  await ensureSecretsLoaded();
+
   const item = items.find(i => i.id === req.params.id);
   
   res.setHeader('Content-Type', 'application/json');
-  item ? res.json({
-    metadata: {
-      provider: process.env.API_PROVIDER_URL || 'localhost'
-    },
-    item
-  }) : res.status(404).send('Item not found');
+  if (item) {
+    res.json({
+      metadata: {
+        provider: process.env.API_PROVIDER_URL || 'localhost'
+      },
+      item
+    });
+  } else {
+    res.status(404).send('Item not found');
+  }
 };
 
 // Endpoint: POST /api/items
-exports.createItem = (req, res) => {
-    const newItem = { id: faker.string.uuid(), ...req.body };
-    if (!newItem.name || !newItem.email || !newItem.registeredAt) {
-        res.status(400).send('Missing required fields: name, email, or registeredAt');
-        return;
-    }
-    items.push(newItem);
-    
-    res.setHeader('Content-Type', 'application/json');
-    res.status(201).json({
+exports.createItem = async (req, res) => {
+  await ensureSecretsLoaded();
+
+  const newItem = { id: faker.string.uuid(), ...req.body };
+  if (!newItem.name || !newItem.email || !newItem.registeredAt) {
+    res.status(400).send('Missing required fields: name, email, or registeredAt');
+    return;
+  }
+  items.push(newItem);
+  
+  res.setHeader('Content-Type', 'application/json');
+  res.status(201).json({
     metadata: {
       provider: process.env.API_PROVIDER_URL || 'localhost'
     },
@@ -66,25 +87,28 @@ exports.createItem = (req, res) => {
 };
 
 // Endpoint: PUT /api/items/:id
-exports.updateItem = (req, res) => {
+exports.updateItem = async (req, res) => {
+  await ensureSecretsLoaded();
+
   const index = items.findIndex(i => i.id === req.params.id);
   if (index !== -1) {
     items[index] = { ...items[index], ...req.body };
-    
-  res.setHeader('Content-Type', 'application/json');
-    res.json(items[index]);
 
-  res.setHeader('Content-Type', 'application/json');  
-} else res.status(404).send('Item not found');
+    res.setHeader('Content-Type', 'application/json');
+    res.json(items[index]);
+  } else {
+    res.status(404).send('Item not found');
+  }
 };
 
 // Endpoint: DELETE /api/items/:id
-exports.deleteItem = (req, res) => {
+exports.deleteItem = async (req, res) => {
+  await ensureSecretsLoaded();
+
   const initialLength = items.length;
   items = items.filter(i => i.id !== req.params.id);
   const deleted = items.length < initialLength;
 
-  
   res.setHeader('Content-Type', 'application/json');
   res.status(deleted ? 204 : 404).send();
 };
