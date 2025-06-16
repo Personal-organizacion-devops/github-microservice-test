@@ -1,11 +1,11 @@
-FROM node:18-alpine
+FROM public.ecr.aws/lambda/nodejs:18
 
-WORKDIR /app
+# Copia package.json y package-lock.json e instala dependencias
 COPY package*.json ./
 RUN npm install --production
 
+# Copia el código fuente
 COPY . .
 
-EXPOSE 80
-
-CMD ["node", "index.js"]
+# Define el handler Lambda (ajusta si tu handler está en otro archivo)
+CMD ["index.handler"]
