@@ -52,6 +52,7 @@ jobs:
   deploy-reutil:
     name: "CD [dev]"
     needs: [build]
+    environment: 'dev'
     uses: ./.github/workflows/deploy.yml
     with:
       aws_region: ${{ vars.AWS_REGION }}
