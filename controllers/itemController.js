@@ -1,7 +1,4 @@
 const { faker } = require('@faker-js/faker');
-const { injectSecrets } = require('../libs/secrets');
-
-injectSecrets();
 
 let items = [];
 
