@@ -1,13 +1,9 @@
 // itemController.js
 
 const { faker } = require('@faker-js/faker');
-
 const { getSecrets } = require('../libs/secrets');
 
 let items = [];
-
-const secrets = await getSecrets();
-const API_PROVIDER_URL = secrets.API_PROVIDER_URL || 'localhost';
 
 // Generar datos fake si está vacío
 function generateFakeItems(count = 10) {
@@ -20,10 +16,13 @@ function generateFakeItems(count = 10) {
 }
 
 // Endpoint: GET /api/items
-exports.getAllItems = (req, res) => {
+exports.getAllItems = async (req, res) => {
   if (items.length === 0) {
     items = generateFakeItems(10);
   }
+  const secrets = await getSecrets();
+  const API_PROVIDER_URL = secrets.API_PROVIDER_URL || 'localhost';
+
   res.status(200);
   res.setHeader('Content-Type', 'application/json');
   res.json({
@@ -35,9 +34,11 @@ exports.getAllItems = (req, res) => {
 };
 
 // Endpoint: GET /api/items/:id
-exports.getItem = (req, res) => {
+exports.getItem = async (req, res) => {
   const item = items.find(i => i.id === req.params.id);
-  
+  const secrets = await getSecrets();
+  const API_PROVIDER_URL = secrets.API_PROVIDER_URL || 'localhost';
+
   res.setHeader('Content-Type', 'application/json');
   item ? res.json({
     metadata: {
@@ -48,16 +49,19 @@ exports.getItem = (req, res) => {
 };
 
 // Endpoint: POST /api/items
-exports.createItem = (req, res) => {
-    const newItem = { id: faker.string.uuid(), ...req.body };
-    if (!newItem.name || !newItem.email || !newItem.registeredAt) {
-        res.status(400).send('Missing required fields: name, email, or registeredAt');
-        return;
-    }
-    items.push(newItem);
-    
-    res.setHeader('Content-Type', 'application/json');
-    res.status(201).json({
+exports.createItem = async (req, res) => {
+  const newItem = { id: faker.string.uuid(), ...req.body };
+  if (!newItem.name || !newItem.email || !newItem.registeredAt) {
+    res.status(400).send('Missing required fields: name, email, or registeredAt');
+    return;
+  }
+  items.push(newItem);
+
+  const secrets = await getSecrets();
+  const API_PROVIDER_URL = secrets.API_PROVIDER_URL || 'localhost';
+
+  res.setHeader('Content-Type', 'application/json');
+  res.status(201).json({
     metadata: {
       provider: API_PROVIDER_URL
     },
@@ -66,25 +70,32 @@ exports.createItem = (req, res) => {
 };
 
 // Endpoint: PUT /api/items/:id
-exports.updateItem = (req, res) => {
+exports.updateItem = async (req, res) => {
   const index = items.findIndex(i => i.id === req.params.id);
   if (index !== -1) {
     items[index] = { ...items[index], ...req.body };
-    
-  res.setHeader('Content-Type', 'application/json');
-    res.json(items[index]);
 
-  res.setHeader('Content-Type', 'application/json');  
-} else res.status(404).send('Item not found');
+    const secrets = await getSecrets();
+    const API_PROVIDER_URL = secrets.API_PROVIDER_URL || 'localhost';
+
+    res.setHeader('Content-Type', 'application/json');
+    res.json({
+      metadata: {
+        provider: API_PROVIDER_URL
+      },
+      item: items[index]
+    });
+  } else {
+    res.status(404).send('Item not found');
+  }
 };
 
 // Endpoint: DELETE /api/items/:id
-exports.deleteItem = (req, res) => {
+exports.deleteItem = async (req, res) => {
   const initialLength = items.length;
   items = items.filter(i => i.id !== req.params.id);
   const deleted = items.length < initialLength;
 
-  
   res.setHeader('Content-Type', 'application/json');
   res.status(deleted ? 204 : 404).send();
 };
