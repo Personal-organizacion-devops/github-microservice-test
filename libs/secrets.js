@@ -11,7 +11,8 @@ async function injectSecrets() {
 
   if (!isRunningInLambda) {
     // En local, simplemente usa el archivo .env
-    require('dotenv').config();
+    // Dynamically import dotenv for compatibility with both CommonJS and ESM
+    await import('dotenv').then(dotenv => dotenv.config());
     console.log('[INFO] Ejecutando en local. Variables de entorno cargadas desde .env.');
     secretsLoaded = true;
     return;
