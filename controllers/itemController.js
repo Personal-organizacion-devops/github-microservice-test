@@ -1,9 +1,9 @@
+// controller/itemController.js
 const { faker } = require('@faker-js/faker');
 const { injectSecrets } = require('../libs/secrets');
 
 async function startSecrets() {
   await injectSecrets();
-  API_PROVIDER_URL = process.env.API_PROVIDER_URL || 'localhost';
 }
 startSecrets();
 
@@ -28,7 +28,7 @@ exports.getAllItems = (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.json({
     metadata: {
-      provider: API_PROVIDER_URL
+      provider: process.env.API_PROVIDER_URL || 'localhost'
     },
     items
   });
@@ -41,7 +41,7 @@ exports.getItem = (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   item ? res.json({
     metadata: {
-      provider: API_PROVIDER_URL
+      provider: process.env.API_PROVIDER_URL || 'localhost'
     },
     item
   }) : res.status(404).send('Item not found');
@@ -59,7 +59,7 @@ exports.createItem = (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(201).json({
     metadata: {
-      provider: API_PROVIDER_URL
+      provider: process.env.API_PROVIDER_URL || 'localhost'
     },
     newItem
   });
