@@ -6,8 +6,8 @@ async function injectSecrets() {
   if (secretsLoaded) return;
 
   const isRunningInLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
-  const REGION_NAME = process.env.REGION; // Cambia a tu región preferida
-  const SECRET_NAME = process.env.SECRET_NAME; // Nombre del secreto en AWS Secrets Manager
+  const REGION_NAME = process.env.REGION;
+  const SECRET_NAME = process.env.SECRET_NAME;
 
   if (!isRunningInLambda) {
     // En local, simplemente usa el archivo .env

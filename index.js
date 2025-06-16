@@ -2,8 +2,16 @@ const serverlessExpress = require('@vendia/serverless-express');
 const app = require('./app');
 const { injectSecrets } = require('./libs/secrets');
 
-(async () => {
-  await injectSecrets(); // Carga los secretos antes de iniciar el servidor
-})();
+let server;
 
-exports.handler = serverlessExpress({ app });
+const init = async () => {
+  await injectSecrets();
+  server = serverlessExpress({ app });
+};
+
+const initPromise = init();
+
+exports.handler = async (event, context) => {
+  await initPromise;
+  return server(event, context);
+};
