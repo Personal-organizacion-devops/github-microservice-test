@@ -23,6 +23,8 @@ jobs:
       - name: Get short SHA
         id: short
         run: echo "short_sha=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
+      - name: Variables
+        run: echo "REGION=${{ inputs.region }}" >> $GITHUB_ENV
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
