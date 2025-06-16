@@ -1,5 +1,9 @@
 const { faker } = require('@faker-js/faker');
 
+const secrets = require('../libs/secrets');
+
+secrets.injectSecrets();
+
 let items = [];
 
 API_PROVIDER_URL = process.env.API_PROVIDER_URL || 'localhost';
