@@ -68,10 +68,13 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
       - name: Update Lambda function
         run: |
+          aws lambda update-function-configuration \
+            --function-name lambda-ms-demo-dev \
+            --environment "Variables={REGION=$REGION}"
+
           aws lambda update-function-code \
             --function-name lambda-ms-demo-dev \
-            --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-            --environment "Variables={REGION=$REGION}"
+            --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: 306157427831.dkr.ecr.us-east-1.amazonaws.com
