@@ -67,18 +67,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
       - name: Update Lambda function
-        with: 
-          region: ${{ vars.AWS_REGION }}
         run: |
           aws lambda update-function-code \
             --function-name lambda-ms-demo-dev \
             --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-            --environment "Variables={REGION=$region}"
+            --environment "Variables={REGION=$REGION}"
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: 306157427831.dkr.ecr.us-east-1.amazonaws.com
           ECR_REPOSITORY: ${{ github.event.repository.name }}
           IMAGE_TAG: ${{ steps.short.outputs.short_sha }} 
+          REGION: ${{ vars.AWS_REGION }}
 
   approval-qa:
     environment:
