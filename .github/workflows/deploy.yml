@@ -11,10 +11,10 @@ on:
         description: 'Application name for deployment'
         required: true
         type: string
-      aws_region:
-        description: 'AWS region for deployment'
-        required: true
-        type: string
+      # aws_region:
+      #   description: 'AWS region for deployment'
+      #   required: true
+      #   type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -22,25 +22,25 @@ on:
         required: true
 jobs:
   deploy:
-    name: Deploy Lambda Function
+    name: Deploy
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
-      - name: Obtener código de fuente
+      - name: Obtener código fuente
         uses: actions/checkout@v4
-      - name: Get short SHA
+      - name: Obtener SHA corto
         id: short
         run: echo "short_sha=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
-      - name: Configure AWS credentials
+      - name: Configurar credenciales de AWS
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-region: ${{ vars.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Update Lambda function
+      - name: Actualizar función Lambda
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
-          ECR_REGISTRY: 306157427831.dkr.ecr.us-east-1.amazonaws.com
+          ECR_REGISTRY: ${{ vars.ECR_URL}}
           ECR_REPOSITORY: ${{ github.event.repository.name }}
           IMAGE_TAG: ${{ steps.short.outputs.short_sha }}
           REGION: ${{ vars.AWS_REGION }}
