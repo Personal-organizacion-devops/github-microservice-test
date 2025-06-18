@@ -16,8 +16,18 @@ jobs:
       - name: Obtener SHA corto
         id: short
         run: echo "short_sha=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
       - name: Instalar dependencias
-        run: echo "Iniciando compilación"
+        run: npm install
+      - name: Ejecutar pruebas
+        run: npm run test
+      - uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
       - name: Configurar credenciales de AWS
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -35,7 +45,6 @@ jobs:
             echo "✅ Repositorio creado: $ECR_REPOSITORY"
           fi
         env:
-          # AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REPOSITORY: ${{ github.event.repository.name }}
       - name: Iniciar sesión en Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
@@ -54,7 +63,6 @@ jobs:
     needs: [build]
     uses: ./.github/workflows/deploy.yml
     with:
-      # aws_region: ${{ vars.AWS_REGION }}
       environment: 'dev'
       app_name: 'ms-demo'
     secrets:
