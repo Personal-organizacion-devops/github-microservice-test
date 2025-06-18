@@ -12,6 +12,11 @@ const initPromise = (async () => {
   }
 })();
 
+// Middleware/función para asegurarnos que los secretos están listos
+async function ensureSecretsLoaded() {
+  await initPromise;
+}
+
 let items = [];
 
 // Generar datos fake si está vacío
@@ -22,11 +27,6 @@ function generateFakeItems(count = 10) {
     email: faker.internet.email(),
     registeredAt: faker.date.past()
   }));
-}
-
-// Middleware/función para asegurarnos que los secretos están listos
-async function ensureSecretsLoaded() {
-  await initPromise;
 }
 
 // Endpoint: GET /api/items
