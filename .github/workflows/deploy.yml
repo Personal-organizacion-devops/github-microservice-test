@@ -1,4 +1,4 @@
-name: Deploy Lambda
+name: [Template] Deploy
 
 on:
   workflow_call:
